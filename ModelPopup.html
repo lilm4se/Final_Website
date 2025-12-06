@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JavaScript Modal Pop-Up Lesson — Semani Dark Mode</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #E33434;
+      --yellow: #FFEC02;
+      --green: #35A849;
+      --bg-dark: #13171A;
+      --fg-dark: #F6F7F8;
+      --card-dark: #191A20;
+      --border-dark: #222;
+    }
+    body {
+      background: var(--bg-dark);
+      color: var(--fg-dark);
+      font-family: 'Montserrat', 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 800px;
+      margin: 2.5em auto;
+      background: var(--card-dark);
+      border-radius: 18px 10px 18px 10px;
+      box-shadow: 0 8px 48px #000a;
+      padding: 2.5em 1.5em 2.5em 1.5em;
+      border: 4px solid var(--border-dark);
+    }
+    h1, h2 {
+      font-family: 'Orbitron', 'Montserrat', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      color: var(--yellow);
+      text-shadow: 0 2px 12px var(--red);
+    }
+    h1 {
+      font-size: 2.15em;
+      margin-bottom: 0.7em;
+      line-height: 1.12;
+    }
+    h1 span {
+      font-size: .72em;
+      font-weight: 400;
+      color: var(--green);
+      text-shadow: none;
+    }
+    h2 {
+      font-size: 1.24em;
+      margin-top: 2em;
+      border-left: 10px solid var(--green);
+      padding-left: 0.8em;
+      color: var(--yellow);
+      margin-bottom: 1.1em;
+    }
+    .mini-bar {
+      width: 52px;
+      height: 6px;
+      background: linear-gradient(90deg,var(--red),var(--yellow),var(--green));
+      border-radius: 4px;
+      margin: 1.4em 0;
+      box-shadow: 0 2px 10px var(--red), 0 1px 11px var(--yellow) inset;
+    }
+    .step {
+      margin-bottom: 2em;
+      padding: 1.05em 1.2em;
+      background: #14161C;
+      border-radius: 12px 25px 12px 8px;
+      border-left: 7px solid var(--yellow);
+      box-shadow: 1px 2px 12px #0e2f1060;
+    }
+    ul, ol {
+      margin-left: 2.1em;
+      margin-bottom: 1em;
+    }
+    .example, .exercise {
+      padding: 1em;
+      border-radius: 10px 17px 10px 6px;
+      margin: 1.3em 0;
+      background: #181D1F;
+      border-left: 5px solid var(--red);
+      border-bottom: 2px solid var(--green);
+      box-shadow: 1px 2px 8px #2227;
+      color: var(--fg-dark);
+    }
+    .exercise {
+      border-left: 6px solid var(--yellow);
+      border-bottom: 2px solid var(--red);
+      color: var(--yellow);
+      background: #181A0B;
+    }
+    button, .modal-btn {
+      padding: 11px 30px;
+      font-family: 'Orbitron', 'Montserrat', sans-serif;
+      font-weight: bold;
+      font-size: 1.06em;
+      color: #191B13;
+      background: linear-gradient(90deg, var(--red) 50%, var(--yellow) 75%, var(--green) 100%);
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      margin-top: 0.7em;
+      margin-bottom: 0.7em;
+      box-shadow: 0 2px 16px #150930cc;
+      border: 2px solid #191E21;
+      outline: 2px solid var(--yellow);
+      outline-offset: 2px;
+      letter-spacing: 0.09em;
+      transition: filter .19s, box-shadow .19s;
+    }
+    button:hover, .modal-btn:hover {
+      filter: brightness(1.10) drop-shadow(0px 2.5px 13px #FFEC02);
+      box-shadow: 0 2px 18px #e3343470, 0 2.5px 15px #FFEC0255;
+      color: #333;
+    }
+    pre {
+      background: #191D20;
+      color: #E8FFCB;
+      padding: 1em 1.4em;
+      font-family: 'Fira Mono', 'Consolas', monospace;
+      font-size: 1em;
+      border-radius: 7px 17px 7px 18px;
+      border: 2px solid var(--green);
+      margin: 1em 0;
+      overflow-x: auto;
+      box-shadow: 0 2px 10px #222c;
+    }
+    code {
+      background: var(--bg-dark);
+      color: var(--yellow);
+      padding: 0.13em 0.48em;
+      border-radius: 4px;
+      font-size: 1.06em;
+      font-family: 'Fira Mono', monospace;
+    }
+    .thanks {
+      font-style: italic;
+      color: var(--green);
+      margin-top: 2.5em;
+      text-align: center;
+      font-size: 1.1em;
+      letter-spacing: 0.06em;
+      border-top: 1px dotted var(--yellow);
+      padding-top: 1em;
+    }
+    @media (max-width: 650px) {
+      .container {
+        padding: 1.3em 0.2em 1em 0.2em;
+      }
+      .mini-bar { width: 65%; }
+    }
+    /* Modal styles */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      z-index: 1200;
+      left: 0; top: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      transition: opacity 0.2s;
+      backdrop-filter: blur(1.5px);
+    }
+    .modal-backdrop.active { display: block; }
+    .modal {
+      position: fixed;
+      z-index: 1300;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      min-width: 310px;
+      max-width: 92vw;
+      background: #191D1F;
+      color: #FFEC02;
+      box-shadow: 0 8px 48px #000a, 0 2px 10px #35A84988;
+      border-radius: 16px 28px 22px 8px;
+      padding: 2em 1.5em 1.2em 1.5em;
+      border: 4px solid #FFEC02;
+      display: none;
+      animation: bounce-in .21s cubic-bezier(.4,2,.8,1.4);
+    }
+    .modal.active {
+      display: block;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    @keyframes bounce-in {
+      0%   { transform: translate(-50%,-56%) scale(0.85);}
+      70%  { transform: translate(-50%,-48%) scale(1.03);}
+      100% { transform: translate(-50%,-50%) scale(1);}
+    }
+    .modal-title {
+      font-family: 'Orbitron', sans-serif;
+      color: #E33434;
+      font-size: 1.3em;
+      margin-bottom: 0.6em;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 9px #FFEC02bb;
+    }
+    .close-modal {
+      position: absolute;
+      top: 15px; right: 18px;
+      background: none;
+      border: none;
+      color: #E33434;
+      font-size: 1.6em;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      transition: color .14s;
+      outline: none;
+    }
+    .close-modal:hover {
+      color: #35A849;
+    }
+    .modal-content {
+      color: #F4F8CC;
+    }
+    .modal-footer {
+      margin-top: 1.2em;
+      text-align: right;
+    }
+    .modal-footer button {
+      margin-left: 1em;
+    }
+  </style>
+  <script>
+    // Modal logic JS
+    function openModal() {
+      document.getElementById('modalBackdrop').classList.add('active');
+      document.getElementById('siteModal').classList.add('active');
+      // Focus for accessibility
+      document.getElementById('closeModalBtn').focus();
+    }
+    function closeModal() {
+      document.getElementById('modalBackdrop').classList.remove('active');
+      document.getElementById('siteModal').classList.remove('active');
+    }
+    document.addEventListener('keydown', function(e) {
+      // Close on Escape
+      if (e.key === "Escape") closeModal();
+    });
+    // Optional: Close when clicking outside modal
+    function modalBackdropClose(e) {
+      if (e.target === document.getElementById('modalBackdrop')) {
+        closeModal();
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- Modal HTML OUTSIDE main container -->
+  <div id="modalBackdrop" class="modal-backdrop" onclick="modalBackdropClose(event)">
+    <div id="siteModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalLabel">
+      <button aria-label="Close" id="closeModalBtn" class="close-modal" onclick="closeModal()">&times;</button>
+      <div class="modal-title" id="modalLabel">Modal Pop-Up</div>
+      <div class="modal-content">
+        <p>Hi! This is a modal. Click outside or the <b>&times;</b> button to close.</p>
+        <p style="margin-bottom:0.2em">You can add <code>forms</code>, <code>messages</code>, or anything here.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+  <!-- Main lesson card -->
+  <div class="container">
+    <h1>:mirror_ball: JavaScript Modal Pop-Up<br>
+      <span>Afrofuturism Dark Mode Lesson</span>
+    </h1>
+    <div class="mini-bar"></div>
+    <div class="step">
+      <h2>Step 1: Project Setup</h2>
+      <ol>
+        <li>Open <b>VSCode</b>.</li>
+        <li>Create a new folder called <code>modal-lesson</code>.</li>
+        <li>Inside it, create <code>index.html</code>.</li>
+        <li>Paste this starter code:</li>
+      </ol>
+      <pre>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Modal Example&lt;/title&gt;
+&lt;/head&gt;
+&lt;body style="background:#13171A; color:#F6F7F8;"&gt;
+&lt;button onclick="openModal()"&gt;Show Modal!&lt;/button&gt;
+&lt;div id="modalBackdrop" style="display:none;position:fixed;z-index:2000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);"&gt;
+  &lt;div style="background:#191d1f;padding:2em 1.5em;border-radius:20px;max-width:350px;margin:100px auto;"&gt;
+    &lt;p&gt;This is a modal pop-up!&lt;/p&gt;
+    &lt;button onclick="closeModal()"&gt;Close&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+  function openModal() {
+    document.getElementById('modalBackdrop').style.display = 'block';
+  }
+  function closeModal() {
+    document.getElementById('modalBackdrop').style.display = 'none';
+  }
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+      </pre>
+    </div>
+    <div class="step">
+      <h2>Step 2: How the Modal Works</h2>
+      <ul>
+        <li>A <code>button</code> calls <code>openModal()</code> to show ("pop up") the modal.</li>
+        <li>The modal is a <b>div</b> that covers the screen and contains a message and close button.</li>
+        <li><code>closeModal()</code> hides it.</li>
+        <li>Styling and JS can be improved (see next step!)</li>
+      </ul>
+      <div class="example">
+      <pre>
+&lt;button onclick="openModal()"&gt;Show Modal&lt;/button&gt;
+&lt;div id="modalBackdrop" style="display:none;"&gt;
+  &lt;div&gt;This is a modal pop-up!
+    &lt;button onclick="closeModal()"&gt;Close&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+// Show/hide modal
+function openModal() { ... }
+function closeModal() { ... }
+&lt;/script&gt;
+      </pre>
+      </div>
+    </div>
+    <div class="step">
+      <h2>Step 3: Try It Out!</h2>
+      <ol>
+        <li>Open your <code>index.html</code> in the browser.</li>
+        <li>Click the <b>Show Modal!</b> button. See the pop-up!</li>
+        <li>Click <b>Close</b> or outside modal to dismiss.</li>
+      </ol>
+      <button class="modal-btn" onclick="openModal()">Show Modal!</button>
+    </div>
+    <div class="step">
+      <h2>:star2: Exercise: Make It Your Own</h2>
+      <div class="exercise">
+        <ul>
+          <li>Change the modal message to your own greeting or emoji.</li>
+          <li>Add a <b>form</b>, <b>image</b>, or <b>your favorite Afrofuturist phrase</b> inside!</li>
+          <li>Make background <span style="color:#E33434;">red</span> or modal border <span style="color:#35A849;">green</span>.</li>
+        </ul>
+        <pre>
+&lt;div style="background:#E33434;"&gt;
+  &lt;p&gt;:ringed_planet: Hello, world!&lt;/p&gt;
+&lt;/div&gt;
+        </pre>
+      </div>
+    </div>
+    <div class="mini-bar"></div>
+    <div class="step">
+      <h2>:bulb: What You've Learned</h2>
+      <ul>
+        <li>How to make a modal pop-up with HTML, CSS, and JavaScript</li>
+        <li>How to use <b>show/hide</b> styles to create window effects</li>
+        <li>How to add accessible, interactive UI features!</li>
+      </ul>
+    </div>
+    <div class="thanks">
+      :sparkles: Dream. Design. Pop Up. — <b>Afrofuturism = Remix Today’s Web</b> :sparkles:
+    </div>
+  </div>
+</body>
+</html>
